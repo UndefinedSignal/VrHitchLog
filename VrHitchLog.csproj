@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- Runs on any newer .NET runtime too (e.g. only .NET 10 installed). -->
+    <RollForward>Major</RollForward>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AssemblyName>VrHitchLog</AssemblyName>
+    <RootNamespace>VrHitchLog</RootNamespace>
+    <Version>0.3.1</Version>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <!-- Windows-only tool; the whole assembly is marked [SupportedOSPlatform("windows")]. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <OpenVrDll>$(MSBuildProjectDirectory)\third_party\openvr\openvr_api.dll</OpenVrDll>
+    <OpenVrDllUrl>https://github.com/ValveSoftware/openvr/raw/v2.5.1/bin/win64/openvr_api.dll</OpenVrDllUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="run.cmd;run-wpr.cmd" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- The OpenVR loader DLL is not stored in the repo: it is fetched once from Valve's official GitHub. -->
+  <Target Name="FetchOpenVrDll" BeforeTargets="Build" Condition="!Exists('$(OpenVrDll)') And '$(OS)' == 'Windows_NT'">
+    <Message Importance="high" Text="Downloading openvr_api.dll from $(OpenVrDllUrl)" />
+    <DownloadFile SourceUrl="$(OpenVrDllUrl)" DestinationFolder="$(MSBuildProjectDirectory)\third_party\openvr" DestinationFileName="openvr_api.dll" />
+  </Target>
+
+  <Target Name="CopyOpenVrDll" AfterTargets="Build" Condition="Exists('$(OpenVrDll)')">
+    <Copy SourceFiles="$(OpenVrDll)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyOpenVrDllPublish" AfterTargets="Publish" Condition="Exists('$(OpenVrDll)')">
+    <Copy SourceFiles="$(OpenVrDll)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

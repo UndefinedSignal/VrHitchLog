@@ -1,0 +1,11 @@
+bin/
+obj/
+out/
+.vs/
+*.user
+# downloaded at build time
+third_party/openvr/openvr_api.dll
+# recorded sessions and traces: may contain personal data, never commit
+session-*/
+*.etl
+*.zip
